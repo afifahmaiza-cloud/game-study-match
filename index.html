@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyMatch - Memory Game</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eeeeee;
+  color: #222;
+}
+
+.header {
+  height: 80px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 11%;
+  gap: 40px;
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #075b83;
+  color: white;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.progress {
+  height: 16px;
+  background: #bddbea;
+  border-radius: 20px;
+  flex: 1;
+  max-width: 680px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #1878aa;
+  border-radius: 20px;
+  transition: width .3s;
+}
+
+.container {
+  max-width: 1068px;
+  margin: 40px auto;
+  padding: 0 15px;
+}
+
+.activity {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 7px;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 7px;
+}
+
+.subtitle {
+  font-size: 15px;
+  margin: 0;
+}
+
+.game {
+  max-width: 693px;
+  margin: 28px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.card {
+  aspect-ratio: 1 / 1;
+  background: white;
+  border: none;
+  border-radius: 20px;
+  padding: 18px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  border: 3px solid #b2d2e1;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  transition: .2s;
+}
+
+.picture {
+  width: 88px;
+  height: 88px;
+  background: #b0d3e4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.card.selected .card-inner,
+.card.matched .card-inner {
+  background: #acd0e2;
+  border-color: #acd0e2;
+}
+
+.card.selected .picture,
+.card.matched .picture {
+  background: #fff;
+}
+
+.card.matched {
+  cursor: default;
+  opacity: .75;
+}
+
+.card:disabled {
+  cursor: default;
+}
+
+.bottom {
+  max-width: 1068px;
+  margin: 32px auto;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 15px;
+}
+
+.continue {
+  width: 175px;
+  height: 45px;
+  border: none;
+  border-radius: 30px;
+  background: #1979a9;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.continue:disabled {
+  background: #c9c9c9;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 0 20px;
+    gap: 20px;
+    height: 70px;
+  }
+
+  .container {
+    margin-top: 30px;
+  }
+
+  .game {
+    gap: 9px;
+    margin-top: 25px;
+  }
+
+  .card {
+    padding: 8px;
+    border-radius: 13px;
+  }
+
+  .card-inner {
+    border-width: 2px;
+  }
+
+  .picture {
+    width: 55px;
+    height: 55px;
+    font-size: 30px;
+  }
+
+  .bottom {
+    margin-top: 25px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+  <button class="close" onclick="exitGame()">×</button>
+
+  <div class="progress">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+
+</header>
+
+<main class="container">
+
+  <div class="activity">ACTIVITY 6</div>
+
+  <h2>Memory game</h2>
+
+  <p class="subtitle">Select the pairs</p>
+
+  <div class="game" id="game"></div>
+
+</main>
+
+<div class="bottom">
+  <button class="continue" id="continue"
+    disabled onclick="finishGame()">
+    Continue
+  </button>
+</div>
+
+<script>
+
+const symbols = [
+  {id: "pomodoro", icon: "🍅"},
+  {id: "active", icon: "🧠"},
+  {id: "spaced", icon: "📚"},
+  {id: "pomodoro", icon: "🍅"},
+  {id: "active", icon: "🧠"},
+  {id: "spaced", icon: "📚"}
+];
+
+let cards = [...symbols].sort(() => Math.random() - 0.5);
+
+let selected = [];
+let matched = [];
+let lock = false;
+
+const game = document.getElementById("game");
+
+function createGame() {
+
+  game.innerHTML = "";
+
+  cards.forEach((card, index) => {
+
+    const button = document.createElement("button");
+
+    button.className = "card";
+    button.innerHTML = `
+      <div class="card-inner">
+        <div class="picture">${card.icon}</div>
+      </div>
+    `;
+
+    button.onclick = () => selectCard(index, button);
+
+    game.appendChild(button);
+
+  });
+
+}
+
+function selectCard(index, button) {
+
+  if (
+    lock ||
+    matched.includes(index) ||
+    selected.some(item => item.index === index)
+  ) return;
+
+  button.classList.add("selected");
+
+  selected.push({
+    index: index,
+    button: button,
+    id: cards[index].id
+  });
+
+  if (selected.length === 2) {
+    checkPair();
+  }
+
+}
+
+function checkPair() {
+
+  lock = true;
+
+  const [first, second] = selected;
+
+  if (first.id === second.id) {
+
+    matched.push(first.index, second.index);
+
+    first.button.classList.add("matched");
+    second.button.classList.add("matched");
+
+    selected = [];
+    lock = false;
+
+    updateProgress();
+
+  } else {
+
+    setTimeout(() => {
+
+      first.button.classList.remove("selected");
+      second.button.classList.remove("selected");
+
+      selected = [];
+      lock = false;
+
+    }, 700);
+
+  }
+
+}
+
+function updateProgress() {
+
+  const percentage = (matched.length / cards.length) * 100;
+
+  document.getElementById("progress").style.width =
+    percentage + "%";
+
+  if (matched.length === cards.length) {
+    document.getElementById("continue").disabled = false;
+  }
+
+}
+
+function finishGame() {
+
+  document.querySelector(".container").innerHTML = `
+    <div style="text-align:center; padding:70px 10px;">
+      <h1>Great Job! 🎉</h1>
+      <h2>You found all the pairs!</h2>
+      <p>Kamu berhasil menyelesaikan Memory Game.</p>
+      <button class="continue" onclick="location.reload()">
+        Play Again
+      </button>
+    </div>
+  `;
+
+}
+
+function exitGame() {
+  if (confirm("Yakin ingin keluar dari game?")) {
+    location.reload();
+  }
+}
+
+createGame();
+
+</script>
+
+</body>
+</html>
