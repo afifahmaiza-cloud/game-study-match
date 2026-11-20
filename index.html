@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyMatch - Memory Game</title>
+<title>StudyMatch - Memory Challenge</title>
 
 <style>
 * {
@@ -15,23 +15,23 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #eeeeee;
-  color: #222;
+  color: #333;
 }
 
-.header {
+header {
   height: 80px;
-  background: #ffffff;
+  background: white;
   display: flex;
   align-items: center;
   padding: 0 11%;
-  gap: 40px;
+  gap: 35px;
 }
 
 .close {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
   border: none;
+  border-radius: 50%;
   background: #075b83;
   color: white;
   font-size: 25px;
@@ -39,21 +39,20 @@ body {
 }
 
 .progress {
-  height: 16px;
+  height: 15px;
+  flex: 1;
   background: #bddbea;
   border-radius: 20px;
-  flex: 1;
+  overflow: hidden;
   max-width: 680px;
   margin: auto;
-  overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
   width: 0%;
-  background: #1878aa;
-  border-radius: 20px;
-  transition: width .3s;
+  background: #1979a9;
+  transition: .3s;
 }
 
 .container {
@@ -69,134 +68,180 @@ body {
 }
 
 h2 {
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 500;
   margin: 0 0 7px;
 }
 
 .subtitle {
-  font-size: 15px;
   margin: 0;
+  font-size: 15px;
+}
+
+.info {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  margin: 25px 0;
+  font-size: 14px;
+}
+
+.info strong {
+  color: #1979a9;
 }
 
 .game {
-  max-width: 693px;
-  margin: 28px auto 0;
+  width: min(100%, 690px);
+  margin: auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
 }
 
 .card {
   aspect-ratio: 1 / 1;
-  background: white;
   border: none;
-  border-radius: 20px;
-  padding: 18px;
+  border-radius: 17px;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
-  transition: .2s;
+  perspective: 700px;
 }
 
 .card-inner {
   width: 100%;
   height: 100%;
-  border: 3px solid #b2d2e1;
-  border-radius: 5px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .5s;
+}
+
+.card.flipped .card-inner,
+.card.matched .card-inner {
+  transform: rotateY(180deg);
+}
+
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 17px;
+  backface-visibility: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  transition: .2s;
 }
 
-.picture {
-  width: 88px;
-  height: 88px;
-  background: #b0d3e4;
+.front {
+  background: #a9cfe2;
+  color: #fff;
+  font-size: 37px;
+  font-weight: bold;
+  border: 3px solid white;
+}
+
+.back {
+  background: white;
+  transform: rotateY(180deg);
+  border: 3px solid #b2d2e1;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.emoji {
+  width: 76px;
+  height: 76px;
+  background: #b3d7e7;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: 40px;
 }
 
-.card.selected .card-inner,
-.card.matched .card-inner {
-  background: #acd0e2;
-  border-color: #acd0e2;
+.card-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
 }
 
-.card.selected .picture,
-.card.matched .picture {
-  background: #fff;
-}
-
-.card.matched {
-  cursor: default;
-  opacity: .75;
+.card.matched .back {
+  background: #d9edf5;
+  border-color: #65a8c8;
 }
 
 .card:disabled {
   cursor: default;
 }
 
+.status {
+  text-align: center;
+  margin: 20px 0;
+  color: #1979a9;
+  font-size: 14px;
+  font-weight: bold;
+}
+
 .bottom {
   max-width: 1068px;
-  margin: 32px auto;
+  margin: 30px auto;
+  padding: 0 15px;
   display: flex;
   justify-content: flex-end;
-  padding: 0 15px;
+  gap: 12px;
 }
 
-.continue {
-  width: 175px;
-  height: 45px;
+button.action {
   border: none;
   border-radius: 30px;
+  padding: 13px 35px;
   background: #1979a9;
   color: white;
-  font-size: 15px;
   cursor: pointer;
+  font-size: 14px;
 }
 
-.continue:disabled {
+button.action:disabled {
   background: #c9c9c9;
   cursor: not-allowed;
 }
 
-@media (max-width: 600px) {
-  .header {
-    padding: 0 20px;
+#result {
+  display: none;
+  text-align: center;
+  padding: 45px 10px;
+}
+
+@media(max-width: 600px) {
+  header {
+    padding: 0 18px;
     gap: 20px;
-    height: 70px;
   }
 
   .container {
-    margin-top: 30px;
+    margin-top: 28px;
   }
 
   .game {
-    gap: 9px;
-    margin-top: 25px;
+    gap: 8px;
   }
 
-  .card {
-    padding: 8px;
-    border-radius: 13px;
+  .front, .back {
+    border-radius: 11px;
   }
 
-  .card-inner {
-    border-width: 2px;
+  .emoji {
+    width: 48px;
+    height: 48px;
+    font-size: 27px;
   }
 
-  .picture {
-    width: 55px;
-    height: 55px;
-    font-size: 30px;
+  .card-name {
+    font-size: 9px;
   }
 
-  .bottom {
-    margin-top: 25px;
+  .info {
+    gap: 20px;
   }
 }
 </style>
@@ -204,168 +249,251 @@ h2 {
 
 <body>
 
-<header class="header">
-
+<header>
   <button class="close" onclick="exitGame()">×</button>
-
   <div class="progress">
     <div class="progress-fill" id="progress"></div>
   </div>
-
 </header>
 
 <main class="container">
 
   <div class="activity">ACTIVITY 6</div>
+  <h2>Memory Challenge</h2>
+  <p class="subtitle">Remember the cards and find the pairs!</p>
 
-  <h2>Memory game</h2>
+  <div class="info">
+    <div>Time: <strong id="timer">00:00</strong></div>
+    <div>Moves: <strong id="moves">0</strong></div>
+    <div>Pairs: <strong id="pairs">0/6</strong></div>
+  </div>
 
-  <p class="subtitle">Select the pairs</p>
+  <div class="status" id="status">
+    Hafalkan posisi kartu! 5 detik lagi...
+  </div>
 
   <div class="game" id="game"></div>
+
+  <div id="result">
+    <h1>🎉 Excellent!</h1>
+    <h2>Memory Challenge Completed!</h2>
+    <p id="finalScore"></p>
+    <button class="action" onclick="location.reload()">
+      Play Again
+    </button>
+  </div>
 
 </main>
 
 <div class="bottom">
-  <button class="continue" id="continue"
-    disabled onclick="finishGame()">
-    Continue
+  <button class="action" id="restart" onclick="location.reload()">
+    Restart
   </button>
 </div>
 
 <script>
 
-const symbols = [
-  {id: "pomodoro", icon: "🍅"},
-  {id: "active", icon: "🧠"},
-  {id: "spaced", icon: "📚"},
-  {id: "pomodoro", icon: "🍅"},
-  {id: "active", icon: "🧠"},
-  {id: "spaced", icon: "📚"}
+const methods = [
+  {id: 1, icon: "🍅", name: "Pomodoro"},
+  {id: 2, icon: "🧠", name: "Active Recall"},
+  {id: 3, icon: "📚", name: "Spaced Repetition"},
+  {id: 4, icon: "💡", name: "Feynman"},
+  {id: 5, icon: "📝", name: "Cornell Notes"},
+  {id: 6, icon: "🔄", name: "Interleaved"}
 ];
 
-let cards = [...symbols].sort(() => Math.random() - 0.5);
+let cards = [...methods, ...methods]
+  .sort(() => Math.random() - 0.5);
 
-let selected = [];
-let matched = [];
-let lock = false;
+let firstCard = null;
+let secondCard = null;
+let lock = true;
+
+let moves = 0;
+let pairs = 0;
+let seconds = 0;
+let timerInterval;
 
 const game = document.getElementById("game");
 
-function createGame() {
+function createCards() {
 
-  game.innerHTML = "";
+  cards.forEach((item, index) => {
 
-  cards.forEach((card, index) => {
+    const card = document.createElement("button");
 
-    const button = document.createElement("button");
+    card.className = "card flipped";
 
-    button.className = "card";
-    button.innerHTML = `
+    card.innerHTML = `
       <div class="card-inner">
-        <div class="picture">${card.icon}</div>
+
+        <div class="front">?</div>
+
+        <div class="back">
+          <div class="emoji">${item.icon}</div>
+          <div class="card-name">${item.name}</div>
+        </div>
+
       </div>
     `;
 
-    button.onclick = () => selectCard(index, button);
+    card.dataset.id = item.id;
 
-    game.appendChild(button);
+    card.onclick = () => chooseCard(card);
+
+    game.appendChild(card);
 
   });
 
 }
 
-function selectCard(index, button) {
+function startGame() {
+
+  createCards();
+
+  let countdown = 5;
+
+  const status = document.getElementById("status");
+
+  const preview = setInterval(() => {
+
+    countdown--;
+
+    if (countdown > 0) {
+      status.innerText =
+        "Hafalkan posisi kartu! " + countdown + " detik lagi...";
+    } else {
+
+      clearInterval(preview);
+
+      document.querySelectorAll(".card").forEach(card => {
+        card.classList.remove("flipped");
+      });
+
+      status.innerText = "Cari pasangan kartu yang sama!";
+      lock = false;
+
+      startTimer();
+    }
+
+  }, 1000);
+
+}
+
+function startTimer() {
+
+  timerInterval = setInterval(() => {
+
+    seconds++;
+
+    let min = Math.floor(seconds / 60);
+    let sec = seconds % 60;
+
+    document.getElementById("timer").innerText =
+      String(min).padStart(2, "0") + ":" +
+      String(sec).padStart(2, "0");
+
+  }, 1000);
+
+}
+
+function chooseCard(card) {
 
   if (
     lock ||
-    matched.includes(index) ||
-    selected.some(item => item.index === index)
+    card.classList.contains("flipped") ||
+    card.classList.contains("matched")
   ) return;
 
-  button.classList.add("selected");
+  card.classList.add("flipped");
 
-  selected.push({
-    index: index,
-    button: button,
-    id: cards[index].id
-  });
-
-  if (selected.length === 2) {
-    checkPair();
+  if (!firstCard) {
+    firstCard = card;
+    return;
   }
+
+  secondCard = card;
+  moves++;
+
+  document.getElementById("moves").innerText = moves;
+
+  checkMatch();
 
 }
 
-function checkPair() {
+function checkMatch() {
 
   lock = true;
 
-  const [first, second] = selected;
+  if (firstCard.dataset.id === secondCard.dataset.id) {
 
-  if (first.id === second.id) {
+    firstCard.classList.add("matched");
+    secondCard.classList.add("matched");
 
-    matched.push(first.index, second.index);
+    pairs++;
 
-    first.button.classList.add("matched");
-    second.button.classList.add("matched");
+    document.getElementById("pairs").innerText =
+      pairs + "/6";
 
-    selected = [];
-    lock = false;
+    document.getElementById("progress").style.width =
+      (pairs / 6 * 100) + "%";
 
-    updateProgress();
+    resetCards();
+
+    if (pairs === 6) {
+      endGame();
+    }
 
   } else {
 
     setTimeout(() => {
 
-      first.button.classList.remove("selected");
-      second.button.classList.remove("selected");
+      firstCard.classList.remove("flipped");
+      secondCard.classList.remove("flipped");
 
-      selected = [];
-      lock = false;
+      resetCards();
 
-    }, 700);
+    }, 850);
 
   }
 
 }
 
-function updateProgress() {
+function resetCards() {
 
-  const percentage = (matched.length / cards.length) * 100;
-
-  document.getElementById("progress").style.width =
-    percentage + "%";
-
-  if (matched.length === cards.length) {
-    document.getElementById("continue").disabled = false;
-  }
+  firstCard = null;
+  secondCard = null;
+  lock = false;
 
 }
 
-function finishGame() {
+function endGame() {
 
-  document.querySelector(".container").innerHTML = `
-    <div style="text-align:center; padding:70px 10px;">
-      <h1>Great Job! 🎉</h1>
-      <h2>You found all the pairs!</h2>
-      <p>Kamu berhasil menyelesaikan Memory Game.</p>
-      <button class="continue" onclick="location.reload()">
-        Play Again
-      </button>
-    </div>
-  `;
+  clearInterval(timerInterval);
+
+  document.getElementById("status").innerText =
+    "All pairs found!";
+
+  document.getElementById("game").style.display = "none";
+  document.querySelector(".info").style.display = "none";
+  document.getElementById("result").style.display = "block";
+
+  document.getElementById("finalScore").innerText =
+    "Waktu: " +
+    document.getElementById("timer").innerText +
+    " | Total percobaan: " + moves;
 
 }
 
 function exitGame() {
-  if (confirm("Yakin ingin keluar dari game?")) {
+
+  if (confirm("Yakin ingin keluar dari permainan?")) {
     location.reload();
   }
+
 }
 
-createGame();
+startGame();
 
 </script>
 
